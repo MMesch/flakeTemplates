@@ -1,0 +1,19 @@
+name: lib
+version: 0.1.0.0
+dependencies:
+  - base == 4.*
+  - hourglass
+  - aeson
+  - hvega
+  - yaml
+  - bytestring
+  - text
+  - process
+  - process-extras
+executables:
+  plotter:
+    main: Main.hs
+    source-dirs:  app
+    dependencies: lib
+library:
+  source-dirs:   src
