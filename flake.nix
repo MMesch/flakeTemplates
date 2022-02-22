@@ -5,14 +5,14 @@
 
     templates = {
 
-      haskellSimple = {
-        path = ./simple-container;
-        description = "A NixOS container running apache-httpd";
+      haskell = {
+        path = ./haskell;
+        description = "Simple Haskell application";
       };
 
     };
 
-    defaultTemplate = self.templates.trivial;
+    defaultTemplate = self.templates.haskell;
 
   };
 }
