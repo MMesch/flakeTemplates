@@ -14,7 +14,7 @@
     in
     {
       overlay = (final: prev: {
-        thisPackage = final.haskellPackages.callCabal2nix "lib" ./. {};
+        thisPackage = final.haskellPackages.callCabal2nixWithOptions "lib" ./. "--hpack" {};
       });
       packages = forAllSystems (system: {
          thisPackage = nixpkgsFor.${system}.thisPackage;
@@ -30,8 +30,6 @@
           buildInputs = with haskellPackages; [
             haskell-language-server
             cabal-install
-            nodePackages.vega-cli
-            nodePackages.vega-lite
           ];
         });
   };

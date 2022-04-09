@@ -4,7 +4,6 @@ dependencies:
   - base == 4.*
   - hourglass
   - aeson
-  - hvega
   - yaml
   - bytestring
   - text
