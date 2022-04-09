@@ -1,5 +1,4 @@
 {
-  # inspired by: https://serokell.io/blog/practical-nix-flakes#packaging-existing-applications
   description = "simple Haskell flake";
   inputs.nixpkgs.url = "nixpkgs";
   outputs = { self, nixpkgs }:
@@ -31,6 +30,7 @@
             haskell-language-server
             cabal-install
           ];
+          shellHook = ''hpack'';
         });
   };
 }
