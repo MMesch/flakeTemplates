@@ -2,10 +2,12 @@
 --inspired by https://github.com/pandoc/lua-filters/tree/master/diagram-generator
 dgram
 
--- classes: pandoc, graphviz, plantuml, mermaid, vegalite, vega
+-- classes: pandoc, graphviz, plantuml, mermaid, vegalite, vega, svgbob
 -- attributes:
-     filetype="svg"|"png"|"pdf"
-     caption=String
+     filetype="svg"|"png"|"pdf"  <-- supported formats
+     caption=String <-- adds a figure caption
+     showcode=True|False  <-- prints the code as code block in addition to the image
+     extraOptions=String <-- these are passed to each runner
 ]]
 
 -- Module pandoc.system is required and was added in version 2.7.3
@@ -193,7 +195,11 @@ function CodeBlock(block)
   -- Finally, put the image inside an empty paragraph. By returning the
   -- resulting paragraph object, the source code block gets replaced by
   -- the image:
-  return pandoc.Para{ img_obj }
+  if block.attributes.showcode then
+    return {block, pandoc.Para{ img_obj}}
+  else
+    return pandoc.Para{ img_obj}
+  end
 end
 
 -- this is the actual filter that is returned to pandoc

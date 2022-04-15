@@ -27,7 +27,7 @@ To use this template, open a new folder and type: `nix flake init -t pandoc-xela
 
 ## Plantuml
 
-```{.plantuml filetype=png width=50%}
+```{.plantuml filetype=png width=50% showcode=true}
 @startuml
 scale 400
 !include <C4/C4_Container>
