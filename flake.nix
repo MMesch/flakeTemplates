@@ -10,6 +10,11 @@
         description = "Simple Haskell application";
       };
 
+      pandocmax = {
+        path = ./pandocmax;
+        description = "Pandoc with custom fonts, citations, references and diagrams";
+      };
+
     };
 
     defaultTemplate = self.templates.haskell;
