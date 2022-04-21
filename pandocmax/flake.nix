@@ -41,9 +41,6 @@
               phases = ["unpackPhase" "buildPhase"];
               buildPhase = ''
               export FONTCONFIG_FILE=${fonts}
-              export JAVA_HOME=${pkgs.jre8}
-              export PLANTUML=${pkgs.plantuml}/lib/plantuml.jar
-              echo $PLANTUML
               mkdir -p $out
               pandoc README.md \
                   --lua-filter=./dgram.lua \
