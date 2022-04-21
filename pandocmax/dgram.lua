@@ -82,7 +82,9 @@ local function graphviz(content, filetype, attributes)
   if attributes.extraOptions then
           args[#args+1] = attributes.extraOptions
   end
-  return pandoc.pipe("dot", args, content)
+  executable = attributes.executable or "dot"
+
+  return pandoc.pipe(executable, args, content)
 end
 
 local function mermaid(content, filetype, attributes)
