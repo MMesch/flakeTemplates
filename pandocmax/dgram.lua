@@ -16,6 +16,7 @@ PANDOC_VERSION:must_be_at_least '2.7.3'
 
 local system = require 'pandoc.system'
 local utils = require 'pandoc.utils'
+local paths = require 'pandoc.path'
 local with_temporary_directory = system.with_temporary_directory
 local with_working_directory = system.with_working_directory
 
@@ -70,11 +71,15 @@ local default_filetype = format_extensions[FORMAT] or "svg"
 local default_mimetype = "image/" .. default_filetype
 
 local function plantuml(content, filetype, attributes)
-  local args = {"-t" .. filetype, "-pipe", "-charset", "UTF8"}
+  infile = "diag.puml"
+  outfile = "diag.svg"
+  convert_to = "diag." .. filetype
+  local args = {infile, "-tsvg", "-charset", "UTF8"}
   if attributes.extraOptions then
           args[#args+1] = attributes.extraOptions
   end
-  return pandoc.pipe("plantuml", args , content)
+  return with_tmp_file(content, infile, outfile, "plantuml", args,
+          convert_to)
 end
 
 local function graphviz(content, filetype, attributes) 
@@ -82,9 +87,8 @@ local function graphviz(content, filetype, attributes)
   if attributes.extraOptions then
           args[#args+1] = attributes.extraOptions
   end
-  executable = attributes.executable or "dot"
 
-  return pandoc.pipe(executable, args, content)
+  return pandoc.pipe("dot", args, content)
 end
 
 local function mermaid(content, filetype, attributes)
@@ -136,6 +140,11 @@ local converters = {
   svgbob = svgbob
 }
 
+function Meta(meta)
+  save_diagrams = meta.save_diagrams
+  print(save_diagrams)
+end
+
 -- This function is executed on every codeblock in the document:
 function CodeBlock(block)
   local img_converter = converters[block.classes[1]]
@@ -161,6 +170,15 @@ function CodeBlock(block)
 
   -- Create figure name by hashing the image content
   local fname = pandoc.sha1(img) .. "." .. filetype
+
+  if save_diagrams then
+    if PANDOC_STATE.output_file ~= nil then
+      local output_dir = paths.directory(PANDOC_STATE.output_file)
+      local f = io.open(paths.join({output_dir, fname}), "w")
+      f:write(img)
+      f:close()
+    end
+  end
 
   pandoc.mediabag.insert(fname, mimetype, img)
 
@@ -206,5 +224,6 @@ end
 
 -- this is the actual filter that is returned to pandoc
 return {
+  {Meta = Meta},
   {CodeBlock = CodeBlock},
 }

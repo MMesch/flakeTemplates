@@ -42,8 +42,8 @@
               buildPhase = ''
               export FONTCONFIG_FILE=${fonts}
               mkdir -p $out
-              pandoc README.md \
-                  --lua-filter=./dgram.lua \
+              pandoc $src/README.md \
+                  --lua-filter=$src/dgram.lua \
                   --filter pandoc-crossref \
                   -M date="`date "+%B %e, %Y"`" \
                   --csl ${styles}/chicago-fullnote-bibliography.csl \
