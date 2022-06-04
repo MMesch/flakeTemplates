@@ -10,6 +10,11 @@
         description = "Simple Haskell application";
       };
 
+      jupyterPyStats = {
+        path = ./jupyterPyStats;
+        description = "Jupyter Lab with stats libraries";
+      };
+
       pandocmax = {
         path = ./pandocmax;
         description = "Pandoc with custom fonts, citations, references and diagrams";
