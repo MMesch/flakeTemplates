@@ -1,6 +1,55 @@
 {
   "nodes": {
+    "ddgram": {
+      "inputs": {
+        "flake-compat": "flake-compat",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1667475244,
+        "narHash": "sha256-Z5n+x6VDSj0PWaUqaVOkzLOpXl+d/55iE3Inr0c2vsI=",
+        "owner": "mmesch",
+        "repo": "ddgram",
+        "rev": "f0437291b68039acfb07996576ddb5128e7952c8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mmesch",
+        "repo": "ddgram",
+        "type": "github"
+      }
+    },
+    "flake-compat": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1650374568,
+        "narHash": "sha256-Z+s0J8/r907g149rllvwhb4pKi8Wam5ij0st8PwAh+E=",
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "rev": "b4a34015c698c7793d592d66adbab377907a2be8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
+      "locked": {
+        "lastModified": 1649676960,
+        "narHash": "sha256-gRqfhOrXnNBuDfJqD0MBLBXgr5odoCJNbGd1ifG3WFM=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "0cfba90938ccd0578b4dda892926be76299395d5",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1640418986,
         "narHash": "sha256-a8GGtxn2iL3WAkY5H+4E0s3Q7XJt6bTOvos9qqxT5OQ=",
@@ -16,7 +65,8 @@
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs",
+        "ddgram": "ddgram",
+        "nixpkgs": "nixpkgs_2",
         "styles": "styles"
       }
     },

@@ -28,7 +28,7 @@ To use this template, open a new folder and type: `nix flake init -t github:mmes
 
 ## Plantuml
 
-```{.plantuml filetype=png width=50% showcode=true}
+```{.ddgram converter=Plantuml filetype=png width=50% showcode=true}
 @startuml
 scale 400
 !include <C4/C4_Container>
@@ -46,7 +46,7 @@ Rel_U(systemAlias, extSystemAlias, "Label", "Optional Technology")
 ```
 ## Graphviz
 
-``` {.graphviz}
+``` {.ddgram converter=GraphViz}
 digraph mygraph {
   fontname="Helvetica,Arial,sans-serif"
   node [fontname="Helvetica,Arial,sans-serif"]
@@ -79,7 +79,7 @@ digraph mygraph {
 ```
 ## Mermaid
 
-```{.mermaid filetype=pdf}
+```{.ddgram converter=Mermaid filetype=pdf}
 flowchart LR
 A[Hard] -->|Text| B(Round)
 B --> C{Decision}
@@ -89,7 +89,7 @@ C -->|Two| E[Result 2]
 
 ## Vegalite
 
-``` {.vegalite filetype=pdf extraOptions="-s0.25"}
+``` {.ddgram converter=VegaLite filetype=pdf extraOptions="-s0.25"}
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "A simple bar chart with embedded data.",
@@ -110,7 +110,7 @@ C -->|Two| E[Result 2]
 
 ## Vega
 
-``` {.vega filetype=pdf}
+``` {.ddgram converter=Vega filetype=pdf}
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "description": "A basic area chart example.",
@@ -207,7 +207,7 @@ C -->|Two| E[Result 2]
 ## SVGBob
 
 
-``` {.svgbob}
+``` {.ddgram converter=Svgbob}
  o->  Quick logo scribbles
         .---.                      _
        /-o-/--       .--.         |-|               .--.

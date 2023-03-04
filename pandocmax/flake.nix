@@ -5,55 +5,51 @@
       nixpkgs.url = "nixpkgs";
       styles.url = github:citation-style-language/styles;
       styles.flake = false;
+      ddgram.url = github:mmesch/ddgram;
   };
-  outputs = { self, nixpkgs, styles }: {
+  outputs = { self, nixpkgs, styles, ddgram }: {
 
-    packages.x86_64-linux.report = (
+    packages.x86_64-linux.pandocWithDiagrams = (
         let
             system = "x86_64-linux";
             pkgs = nixpkgs.legacyPackages.${system};
             fonts = pkgs.makeFontsConf { fontDirectories = [ pkgs.dejavu_fonts ]; };
-        in
-          pkgs.stdenv.mkDerivation {
-              name = "XelatexReport";
-              src = ./.;
-              buildInputs = with pkgs; [
-                  pandoc
-                  haskellPackages.pandoc-crossref
-                  texlive.combined.scheme-small
-                  gnome.librsvg # for conversion from svg to pdf
-                  graphviz
-                  plantuml
-                  nodePackages.vega-cli
-                  # the following is waiting on https://github.com/NixOS/nixpkgs/pull/162434
-                  (nodePackages.vega-lite.override {
-                      postInstall = ''
-                          cd node_modules
-                          for dep in ${nodePackages.vega-cli}/lib/node_modules/vega-cli/node_modules/*; do
-                            if [[ ! -d ''${dep##*/} ]]; then
-                              ln -s "${nodePackages.vega-cli}/lib/node_modules/vega-cli/node_modules/''${dep##*/}"
-                            fi
-                          done
-                        '';})
-                  nodePackages.mermaid-cli
-                  svgbob
-                  ];
-              phases = ["unpackPhase" "buildPhase"];
-              buildPhase = ''
+            dgramScript = ./dgram.lua;
+            execName = "pandocDgram";
+            pandocDgram = pkgs.writeShellScriptBin execName ''
+              echo "converting"
               export FONTCONFIG_FILE=${fonts}
-              mkdir -p $out
-              pandoc $src/README.md \
-                  --lua-filter=$src/dgram.lua \
+              pandoc \
+                  --lua-filter=${dgramScript} \
                   --filter pandoc-crossref \
                   -M date="`date "+%B %e, %Y"`" \
                   --csl ${styles}/chicago-fullnote-bibliography.csl \
                   --citeproc \
                   --pdf-engine=xelatex \
-                  -o $out/README.pdf
+                  "$@"
+              echo "pandoc done"
+              '';
+            dgramDependencies = with pkgs; [
+                pandoc
+                haskellPackages.pandoc-crossref
+                texlive.combined.scheme-small
+                ddgram.packages.x86_64-linux.default
+                ];
+        in
+          pkgs.symlinkJoin {
+              name = execName;
+              paths = [ pandocDgram ] ++ dgramDependencies;
+              buildInputs = [ pkgs.makeWrapper ];
+              postBuild = ''
+                wrapProgram $out/bin/${execName} --prefix PATH : $out/bin
+                for f in $out/lib/node_modules/.bin/*; do
+                   path="$(readlink --canonicalize-missing "$f")"
+                   ln -s "$path" "$out/bin/$(basename $f)"
+                done
               '';
           }
         );
 
-    defaultPackage.x86_64-linux = self.packages.x86_64-linux.report;
+    defaultPackage.x86_64-linux = self.packages.x86_64-linux.pandocWithDiagrams;
   };
 }

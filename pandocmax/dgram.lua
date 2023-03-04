@@ -13,22 +13,12 @@ dgram
 -- Module pandoc.system is required and was added in version 2.7.3
 PANDOC_VERSION:must_be_at_least '2.7.3'
 
-
+-- imports
 local system = require 'pandoc.system'
 local utils = require 'pandoc.utils'
 local paths = require 'pandoc.path'
-local with_temporary_directory = system.with_temporary_directory
-local with_working_directory = system.with_working_directory
 
-local function convert(infile, convert_to)
-  if infile:match "[^.]+$" == "svg" then
-      filetype = convert_to:match "[^.]+$"
-      pandoc.pipe("rsvg-convert", {infile, "-f", filetype, "-o", convert_to}, '')
-  else
-     print("conversion of " .. infile .. " to " .. outfile .. " not implemented")
-  end
-end
-
+-- helper functions
 local function dump_to_file(content, infile)
   local f = io.open(infile, 'w')
   f:write(content)
@@ -42,22 +32,17 @@ local function read_from_file(fname)
   return img_data
 end
 
-local function with_tmp_file(content, infile, outfile, exec, args,
-                convert_to)
-  return with_temporary_directory("pandoc_diagram", function (tmpdir)
-    return with_working_directory(tmpdir, function ()
+local function with_tmp_file(content, infile, outfile, exec, args)
+  return system.with_temporary_directory("pandoc_diagram", function (tmpdir)
+    return system.with_working_directory(tmpdir, function ()
       dump_to_file(content, infile)
       pandoc.pipe(exec, args, '')
-      if convert_to then
-          convert(outfile, convert_to)
-      end
       return read_from_file(convert_to or outfile)
     end)
   end)
 end
-local stringify = function (s)
-  return type(s) == 'string' and s or utils.stringify(s)
-end
+
+-- configuration 
 
 local format_extensions = {
         latex = "pdf",
@@ -68,99 +53,42 @@ local format_extensions = {
         html = "svg"}
 
 local default_filetype = format_extensions[FORMAT] or "svg"
+
 local default_mimetype = "image/" .. default_filetype
 
-local function plantuml(content, filetype, attributes)
-  infile = "diag.puml"
-  outfile = "diag.svg"
-  convert_to = "diag." .. filetype
-  local args = {infile, "-tsvg", "-charset", "UTF8"}
-  if attributes.extraOptions then
-          args[#args+1] = attributes.extraOptions
-  end
-  return with_tmp_file(content, infile, outfile, "plantuml", args,
-          convert_to)
-end
-
-local function graphviz(content, filetype, attributes) 
-  local args = {"-T" .. filetype}
-  if attributes.extraOptions then
-          args[#args+1] = attributes.extraOptions
-  end
-
-  return pandoc.pipe("dot", args, content)
-end
-
-local function mermaid(content, filetype, attributes)
-  infile = "diag.mmd"
-  outfile = "diag." .. filetype
-  local args = {"-i", infile, "-o", outfile}
-  if attributes.extraOptions then
-          args[#args+1] = attributes.extraOptions
-  end
-  return with_tmp_file(content, infile, outfile, "mmdc", args)
-end
-
-local function vegalite(content, filetype, attributes)
-  executable = "vl2" .. filetype
-  local args = {}
-  if attributes.extraOptions then
-          args[#args+1] = attributes.extraOptions
-  end
-  return pandoc.pipe(executable, args, content)
-end
-
-local function vega(content, filetype, attributes)
-  executable = "vg2" .. filetype
-  local args = {}
-  if attributes.extraOptions then
-          args[#args+1] = attributes.extraOptions
-  end
-  return pandoc.pipe(executable, args, content)
-end
-
-local function svgbob(content, filetype, attributes)
-  infile = "diag.txt"
-  outfile = "diag.svg"
-  convert_to = "diag." .. filetype
-  local args = {infile, "-o", outfile}
-  if attributes.extraOptions then
-          args[#args+1] = attributes.extraOptions
-  end
-  return with_tmp_file(content, infile, outfile, "svgbob",
-          args, convert_to)
-end
-
-local converters = {
-  plantuml = plantuml,
-  graphviz = graphviz,
-  mermaid = mermaid,
-  vegalite = vegalite,
-  vega = vega,
-  svgbob = svgbob
-}
-
+-- parameters
 function Meta(meta)
   save_diagrams = meta.save_diagrams
   print(save_diagrams)
 end
 
+-- converter
+local function ddgram(content, filetype, attributes)
+  executable = "ddgram"
+  local infile = "graph-description"
+  local outfile = "out." .. filetype
+  local args = {"convert", infile, "-i", attributes.converter, "-o", outfile}
+  if attributes.extraOptions then
+          args[#args+1] = "--extraOptions" 
+          args[#args+1] = attributes.extraOptions
+  end
+  return with_tmp_file(content, infile, outfile, executable, args)
+end
+
 -- This function is executed on every codeblock in the document:
 function CodeBlock(block)
-  local img_converter = converters[block.classes[1]]
-
-  -- do nothing if no converter exists
-  if not img_converter then
+  -- do nothing if it's not a ddgram block 
+  if not block.classes[1] == "ddgram" then
     return nil
   end
 
+  print("converter used: " .. block.attributes.converter)
   local filetype = block.attributes.filetype or default_filetype
   local mimetype = "image/" .. filetype
   print("filetype is " .. filetype)
 
   -- Call the correct converter which belongs to the used class:
-  local success, img = pcall(
-          img_converter, block.text, filetype, block.attributes)
+  local success, img = pcall(ddgram, block.text, filetype, block.attributes)
 
   if not (success and img) then
     io.stderr:write(tostring(img or "no image data has been returned."))
