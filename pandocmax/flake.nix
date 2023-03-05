@@ -14,36 +14,31 @@
             system = "x86_64-linux";
             pkgs = nixpkgs.legacyPackages.${system};
             fonts = pkgs.makeFontsConf { fontDirectories = [ pkgs.dejavu_fonts ]; };
-            execName = "pandocDgram";
-            pandocDgram = pkgs.writeShellScriptBin execName ''
+        in
+          pkgs.writeShellApplication {
+            name = "pandoc-dgram";
+            runtimeInputs =
+                with pkgs; [
+                  pandoc
+                  haskellPackages.pandoc-crossref
+                  texlive.combined.scheme-small
+                    ];
+            text = ''
               echo "converting"
               export FONTCONFIG_FILE=${fonts}
               pandoc \
                   --lua-filter=${dgram.packages.x86_64-linux.pandocScript}/dgram.lua \
                   --filter pandoc-crossref \
-                  -M date="`date "+%B %e, %Y"`" \
+                  -M date="$(date "+%B %e, %Y")" \
                   --csl ${styles}/chicago-fullnote-bibliography.csl \
                   --citeproc \
                   --pdf-engine=xelatex \
                   "$@"
               echo "pandoc done"
               '';
-            dgramDependencies = with pkgs; [
-                pandoc
-                haskellPackages.pandoc-crossref
-                texlive.combined.scheme-small
-                ];
-        in
-          pkgs.symlinkJoin {
-              name = execName;
-              paths = [ pandocDgram ] ++ dgramDependencies;
-              buildInputs = [ pkgs.makeWrapper ];
-              postBuild = ''
-                wrapProgram $out/bin/${execName} --prefix PATH : $out/bin
-              '';
           }
         );
 
-    defaultPackage.x86_64-linux = self.packages.x86_64-linux.pandocWithDiagrams;
+        packages.x86_64-linux.default = self.packages.x86_64-linux.pandocWithDiagrams;
   };
 }
