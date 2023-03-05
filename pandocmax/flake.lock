@@ -1,21 +1,21 @@
 {
   "nodes": {
-    "ddgram": {
+    "dgram": {
       "inputs": {
         "flake-compat": "flake-compat",
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1677969919,
-        "narHash": "sha256-kadA6jqlNJiAbBSju/1buBawhFGD/DmJSTRGKyt+ZMM=",
+        "lastModified": 1678005272,
+        "narHash": "sha256-MGgFdw3C5hzbmNBkPGDwNPGyIXUmd628po1Z35kYMGY=",
         "owner": "mmesch",
-        "repo": "ddgram",
-        "rev": "3437563f8edf43134c2a61360e1a593d5a9b01cf",
+        "repo": "dgram",
+        "rev": "bd47750448fb4c29bae5244bc1e1e2e0982c546d",
         "type": "github"
       },
       "original": {
         "owner": "mmesch",
-        "repo": "ddgram",
+        "repo": "dgram",
         "type": "github"
       }
     },
@@ -65,7 +65,7 @@
     },
     "root": {
       "inputs": {
-        "ddgram": "ddgram",
+        "dgram": "dgram",
         "nixpkgs": "nixpkgs_2",
         "styles": "styles"
       }

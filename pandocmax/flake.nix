@@ -5,9 +5,9 @@
       nixpkgs.url = "nixpkgs";
       styles.url = github:citation-style-language/styles;
       styles.flake = false;
-      ddgram.url = github:mmesch/ddgram;
+      dgram.url = github:mmesch/dgram;
   };
-  outputs = { self, nixpkgs, styles, ddgram }: {
+  outputs = { self, nixpkgs, styles, dgram }: {
 
     packages.x86_64-linux.pandocWithDiagrams = (
         let
@@ -19,7 +19,7 @@
               echo "converting"
               export FONTCONFIG_FILE=${fonts}
               pandoc \
-                  --lua-filter=${ddgram.packages.x86_64-linux.pandocScript}/dgram.lua \
+                  --lua-filter=${dgram.packages.x86_64-linux.pandocScript}/dgram.lua \
                   --filter pandoc-crossref \
                   -M date="`date "+%B %e, %Y"`" \
                   --csl ${styles}/chicago-fullnote-bibliography.csl \
